@@ -25,4 +25,5 @@ which family won, and how ties were broken.
 
 ## Status
 
-Repository scaffold only. See [`TODO.md`](TODO.md) for the build plan.
+Repository scaffold only. Planned as an Astro app deployed as a Cloudflare
+Worker via wrangler. See [`TODO.md`](TODO.md) for the build plan.

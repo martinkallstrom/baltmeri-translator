@@ -47,12 +47,20 @@ Synthesis needs the nine source-language forms for each concept.
   breaks with queue state, inflection applied.
 - Keyboard: Ctrl/Cmd+Enter to translate, Ctrl/Cmd+Shift+S to swap.
 
-## 4. Stack (suggested — adjust when building)
+## 4. Stack (decided)
 
-- TypeScript throughout; the engine as a dependency-free, pure package
-  (`packages/engine`) so it can be tested in isolation and reused.
-- Web UI as a static app (Vite + a small framework or vanilla) deployed on
-  Cloudflare Workers/Pages, consistent with the other repos in this account.
+- **Astro** app deployed as a **Cloudflare Worker** with **wrangler**.
+  Reference implementation for the same setup:
+  `~/Projects/nuvai-health/nuvai-financial` (`astro.config.mjs` with
+  `@astrojs/cloudflare`, `wrangler.jsonc` with the `assets` binding and
+  `nodejs_compat`, `src/worker.ts` entrypoint, scripts `dev`/`build`/
+  `preview`/`deploy`).
+- The translation engine as a pure, dependency-free TypeScript package
+  (`packages/engine` or `src/engine/`) so it runs both in the browser and in
+  the Worker, and can be tested in isolation.
+- Translation API as an Astro endpoint (`src/pages/api/translate.json.ts`)
+  backed by the engine; the UI calls it, so the reverse direction and the
+  derivation cache can live server-side.
 - Vitest for the golden tests derived from the manual.
 
 ## 5. Finish
