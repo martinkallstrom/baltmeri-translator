@@ -63,7 +63,19 @@ Synthesis needs the nine source-language forms for each concept.
   derivation cache can live server-side.
 - Vitest for the golden tests derived from the manual.
 
-## 5. Finish
+## 5. Voice synthesis (decided)
+
+- Speak Baltmeri output with **ElevenLabs**, model **Eleven Multilingual v2**
+  (`eleven_multilingual_v2`).
+- **No language override**: do not pass `language_code`; let the model infer
+  pronunciation from the text. Baltmeri is not a supported language, and its
+  orthography (§2) is closest to a Baltic/Finnic blend, so forcing any single
+  language code would bias the accent.
+- Secrets live in `.env` (git-ignored): `ANTHROPIC_API_KEY` for the upstream
+  LLM lookup step (§2 above), `ELEVENLABS_API_KEY` for TTS. Read them from the
+  Worker environment, never from the client bundle.
+
+## 6. Finish
 
 - Convenience scripts: `dev`, `test`, `build`, `deploy`.
 - README: usage, derivation-order decision, deployment URL.
