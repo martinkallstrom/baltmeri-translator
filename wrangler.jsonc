@@ -11,5 +11,8 @@
 		"directory": "./dist",
 		"run_worker_first": true
 	},
+	"kv_namespaces": [
+		{ "binding": "BALTMERI_CACHE", "id": "31915cbe6420437ea2db784a444edc05" }
+	],
 	"observability": { "enabled": true }
 }

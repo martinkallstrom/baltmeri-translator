@@ -13,8 +13,6 @@ function transliterate(s: string): string {
   return s.split("").map((c) => (c in CYRILLIC ? CYRILLIC[c] : c)).join("");
 }
 
-const CONS = "bcdfghjklmnpqrstvwxzčšžćśźńłż";
-
 /** Ordered rewrite rules per language. Applied after lowercasing and NFC. */
 const RULES: Record<Lang, Rule[]> = {
   fi: [[/y/g, "ü"], [/å/g, "o"], [/w/g, "v"], [/c/g, "k"], [/x/g, "ks"]],

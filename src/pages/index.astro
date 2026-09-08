@@ -1,0 +1,106 @@
+---
+import "../styles/global.css";
+export const prerender = false;
+const langs: [string, string][] = [
+  ["auto", "Detect language"], ["en", "English"], ["sv", "Swedish"], ["da", "Danish"], ["de", "German"],
+  ["fi", "Finnish"], ["et", "Estonian"], ["lv", "Latvian"], ["lt", "Lithuanian"], ["pl", "Polish"], ["ru", "Russian"]
+];
+---
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <title>Baltmeri Translator</title>
+    <meta name="description" content="Translate into Baltmeri, the language the Baltic Sea would speak — and see the reasoning behind every word." />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M8 32c10-14 26-14 36 0-10 14-26 14-36 0z' fill='%231a66ff'/%3E%3Cpath d='M44 32l14-12v24z' fill='%230b3fb3'/%3E%3Ccircle cx='20' cy='30' r='3' fill='%23fff'/%3E%3C/svg%3E" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:ital,wght@0,500;0,700;1,500&display=swap" rel="stylesheet" />
+  </head>
+  <body>
+    <main class="page">
+      <header class="hero">
+        <div class="school" aria-hidden="true">
+          <svg class="fish f1" viewBox="0 0 64 36"><path d="M4 18c10-14 28-14 40 0-12 14-30 14-40 0z" fill="#1a66ff"/><path d="M42 18l16-11v22z" fill="#0b3fb3"/><circle cx="16" cy="15" r="3" fill="#fff"/><circle cx="17" cy="15" r="1.4" fill="#0f2a52"/><path d="M22 22q6 4 12 0" stroke="#fff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+          <svg class="fish f2" viewBox="0 0 64 36"><path d="M4 18c10-14 28-14 40 0-12 14-30 14-40 0z" fill="#7fb0ff"/><path d="M42 18l16-11v22z" fill="#1a66ff"/><circle cx="16" cy="15" r="3" fill="#fff"/><circle cx="17" cy="15" r="1.4" fill="#0f2a52"/></svg>
+          <svg class="fish f3" viewBox="0 0 64 36"><path d="M4 18c10-14 28-14 40 0-12 14-30 14-40 0z" fill="#0b3fb3"/><path d="M42 18l16-11v22z" fill="#1a66ff"/><circle cx="16" cy="15" r="3.4" fill="#fff"/><circle cx="17" cy="15" r="1.6" fill="#0f2a52"/><path d="M26 10a6 6 0 0 1 8 4" stroke="#7fb0ff" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+          <svg class="fish f4" viewBox="0 0 64 36"><path d="M4 18c10-14 28-14 40 0-12 14-30 14-40 0z" fill="#ff7a59"/><path d="M42 18l16-11v22z" fill="#e85d3a"/><circle cx="16" cy="15" r="3" fill="#fff"/><circle cx="17" cy="15" r="1.4" fill="#0f2a52"/></svg>
+        </div>
+        <h1><span>B</span><span>a</span><span>l</span><span>t</span><span>m</span><span>e</span><span>r</span><span>i</span></h1>
+        <p>The language the Baltic Sea would speak — every word decided by nine languages, one vote per family.</p>
+      </header>
+
+      <section class="bar" aria-label="Languages">
+        <div id="from-slot">
+          <select id="from" class="lang" aria-label="Source language">
+            {langs.map(([v, l]) => <option value={v}>{l}</option>)}
+          </select>
+        </div>
+        <button id="swap" class="swap" title="Swap direction (Ctrl/Cmd+Shift+S)" aria-label="Swap direction">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg>
+        </button>
+        <div id="to-slot">
+          <div class="lang-fixed" id="to-fixed">Baltmeri</div>
+          <select id="to" class="lang" aria-label="Target language" hidden>
+            {langs.filter(([v]) => v !== "auto").map(([v, l]) => <option value={v}>{l}</option>)}
+          </select>
+        </div>
+      </section>
+
+      <section class="panes">
+        <div class="pane input">
+          <textarea id="src" placeholder="Type something… e.g. Grey seals rest on the rocks in summer." maxlength="1200" spellcheck="false"></textarea>
+          <div class="foot">
+            <span><span class="kbd">Ctrl</span> + <span class="kbd">Enter</span> to translate · <span id="count">0</span>/1200</span>
+            <button id="go" class="btn primary">Translate</button>
+          </div>
+        </div>
+        <div class="pane output">
+          <div class="bubbles" id="busy" hidden><i></i><i></i><i></i></div>
+          <div class="result" id="out"><span class="placeholder">Baltmeri appears here — click a word to see how it was decided.</span></div>
+          <div class="status" id="status"></div>
+          <div class="foot">
+            <span id="meta"></span>
+            <span style="display:flex;gap:8px">
+              <button id="copy" class="btn ghost" disabled title="Copy"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V5a1 1 0 0 1 1-1h10"/></svg>Copy</button>
+              <button id="speak" class="btn ghost" disabled title="Speak (Eleven Multilingual v2)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M4 10v4h4l5 4V6L8 10H4z"/><path d="M16 9a4 4 0 0 1 0 6M18.5 6.5a8 8 0 0 1 0 11"/></svg>Speak</button>
+            </span>
+          </div>
+          <div class="audio" id="audio" hidden></div>
+        </div>
+      </section>
+
+      <section class="legend" id="legend">
+        <h2>
+          <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="30" fill="#fff"/><path d="M14 40c4-16 32-16 36 0-2 8-34 8-36 0z" fill="#8fb4e6"/><circle cx="24" cy="34" r="2.5" fill="#0f2a52"/><circle cx="40" cy="34" r="2.5" fill="#0f2a52"/><ellipse cx="32" cy="40" rx="4" ry="2.5" fill="#0f2a52"/><path d="M26 44q6 4 12 0" stroke="#0f2a52" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+          Legend
+        </h2>
+        <div class="body" id="tutorial"><p class="muted">Translate something and the seal will explain which rule decided each word, who won the vote, and how the Visby Queue broke the ties.</p></div>
+        <svg class="seal" viewBox="0 0 200 140" aria-hidden="true">
+          <ellipse cx="100" cy="128" rx="90" ry="10" fill="#d3e4ff"/>
+          <path d="M20 118c10-40 60-70 120-60 22 4 40 22 40 40 0 12-10 20-24 20H40c-14 0-22-6-20-0z" fill="#9fc0ea"/>
+          <path d="M150 118c14-2 26-12 30-26 4-14-4-26-14-30" fill="none" stroke="#9fc0ea" stroke-width="14" stroke-linecap="round"/>
+          <path d="M170 60l16-18 4 22z" fill="#9fc0ea"/>
+          <circle cx="62" cy="80" r="30" fill="#b3cff0"/>
+          <circle cx="52" cy="76" r="3.6" fill="#0f2a52"/><circle cx="72" cy="76" r="3.6" fill="#0f2a52"/>
+          <circle cx="53.5" cy="74.5" r="1.2" fill="#fff"/><circle cx="73.5" cy="74.5" r="1.2" fill="#fff"/>
+          <ellipse cx="62" cy="88" rx="6" ry="4" fill="#0f2a52"/>
+          <path d="M50 94q12 8 24 0" stroke="#0f2a52" stroke-width="2.2" fill="none" stroke-linecap="round"/>
+          <path d="M38 88l-14 2M38 92l-14 6M86 88l14 2M86 92l14 6" stroke="#0f2a52" stroke-width="1.6" stroke-linecap="round"/>
+          <circle cx="44" cy="86" r="4" fill="#ffb3a0" opacity=".7"/><circle cx="80" cy="86" r="4" fill="#ffb3a0" opacity=".7"/>
+          <path d="M70 118l16-10 6 12" fill="#9fc0ea"/>
+        </svg>
+      </section>
+
+      <section class="trace" id="trace" hidden></section>
+
+      <footer>
+        <svg class="wave" viewBox="0 0 1200 26" preserveAspectRatio="none" aria-hidden="true"><path d="M0 13c100-16 200-16 300 0s200 16 300 0 200-16 300 0 200 16 300 0v13H0z" fill="#e8f1ff"/></svg>
+        Word forms are derived deterministically from the <a href="https://github.com/martinkallstrom/baltmeri-translator/blob/main/docs/baltmeri_manual.md">Baltmeri manual</a>.
+        An LLM analyses your sentence and supplies the nine source words; it never writes the Baltmeri. Voice: Eleven Multilingual v2. <a href="/api/lexicon.json">Lexicon</a>.
+      </footer>
+    </main>
+    <script src="../scripts/app.ts"></script>
+  </body>
+</html>

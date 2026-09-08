@@ -2,8 +2,7 @@
   "extends": "astro/tsconfigs/strict",
   "compilerOptions": {
     "allowJs": true,
-    "resolveJsonModule": true,
-    "types": ["@cloudflare/workers-types"]
+    "resolveJsonModule": true
   },
   "include": [".astro/types.d.ts", "**/*"],
   "exclude": ["dist"]
