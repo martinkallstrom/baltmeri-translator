@@ -1,7 +1,14 @@
 {
   "name": "baltmeri-translator",
   "version": "0.1.0",
+  "description": "A translator for Baltmeri, a language synthesised deterministically from the nine languages of the Baltic Sea.",
   "private": true,
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/martinkallstrom/baltmeri-translator.git"
+  },
+  "homepage": "https://baltmeri-translator.kindship-ai.workers.dev/about/",
   "type": "module",
   "engines": {
     "node": ">=22.12.0"

@@ -1,0 +1,32 @@
+cff-version: 1.2.0
+message: "If you use Baltmeri, the engine or the paper, please cite it as below."
+title: "Baltmeri: Deterministic Synthesis of a Shared Language for the Baltic Sea from the Nine Languages of Its Shores"
+type: software
+authors:
+  - family-names: Källström
+    given-names: Martin
+  - family-names: Retourné
+    given-names: Belinda
+year: 2026
+url: "https://github.com/martinkallstrom/baltmeri-translator"
+repository-code: "https://github.com/martinkallstrom/baltmeri-translator"
+license: MIT
+keywords:
+  - constructed language
+  - Baltic Sea
+  - zonal auxiliary language
+  - consonant skeletons
+  - deterministic lexicogenesis
+  - rights of nature
+preferred-citation:
+  type: report
+  title: "Baltmeri: Deterministic Synthesis of a Shared Language for the Baltic Sea from the Nine Languages of Its Shores"
+  authors:
+    - family-names: Källström
+      given-names: Martin
+    - family-names: Retourné
+      given-names: Belinda
+  institution:
+    name: The Baltmeri Project
+  year: 2026
+  url: "https://github.com/martinkallstrom/baltmeri-translator/blob/main/docs/paper/baltmeri-paper.pdf"

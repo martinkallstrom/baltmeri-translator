@@ -1,6 +1,8 @@
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
 	"name": "baltmeri-translator",
+	// Deploying your own copy: set this to your Cloudflare account id (or remove it if you have one account),
+	// and replace the KV namespace id below with one from `wrangler kv namespace create BALTMERI_CACHE`.
 	"account_id": "129f968637a65720067f29f9cf177a0e",
 	"main": "./src/worker.ts",
 	"compatibility_date": "2026-09-04",
