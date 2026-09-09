@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Baltmeri — a shared language for the Baltic Sea</title>
+<meta name="description" content="Baltmeri: deterministic synthesis of a shared language for the Baltic Sea from the nine languages of its shores. Paper, translation engine, live demo.">
+<meta property="og:title" content="Baltmeri — a shared language for the Baltic Sea">
+<meta property="og:description" content="Every word decided by nine languages voting as four equal families, ties broken by the geography of the sea. Paper, code and live translator.">
+<meta property="og:image" content="site/paper-page1.png">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath d='M8 32c10-14 26-14 36 0-10 14-26 14-36 0z' fill='%231a66ff'/%3E%3Cpath d='M44 32l14-12v24z' fill='%230b3fb3'/%3E%3Ccircle cx='20' cy='30' r='3' fill='%23fff'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#111827;--muted:#4b5563;--rule:#e5e7eb;--blue:#0b3fb3;--blue-soft:#eaf1ff;--bg:#fff;--max:880px}
+*{box-sizing:border-box}
+html{color-scheme:light}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.6 "Source Serif 4",Charter,Georgia,serif}
+a{color:var(--blue)}
+.wrap{max-width:var(--max);margin:0 auto;padding:0 20px}
+header{padding:64px 0 24px;text-align:center}
+h1{font-weight:600;font-size:clamp(1.8rem,4.2vw,2.6rem);line-height:1.2;margin:0 0 18px;letter-spacing:-.01em}
+.authors{font-size:1.15rem;margin:0 0 6px}
+.authors span{white-space:nowrap}
+.affil{color:var(--muted);font-family:Inter,system-ui,sans-serif;font-size:.95rem;margin:0 0 26px}
+.buttons{display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-bottom:8px}
+.btn{display:inline-flex;align-items:center;gap:8px;background:var(--ink);color:#fff;text-decoration:none;border-radius:999px;padding:10px 18px;font:500 .95rem Inter,system-ui,sans-serif;transition:transform .12s,background .15s}
+.btn:hover{background:var(--blue);transform:translateY(-1px)}
+.btn svg{width:18px;height:18px;fill:currentColor}
+.btn.alt{background:var(--blue-soft);color:var(--blue)}
+.teaser{margin:36px auto 10px;text-align:center}
+.teaser img{max-width:100%;height:auto}
+.teaser figcaption,.fig figcaption{font:.9rem/1.5 Inter,system-ui,sans-serif;color:var(--muted);margin-top:10px}
+.lead{font-size:1.35rem;line-height:1.45;text-align:center;max-width:760px;margin:28px auto 0;font-style:italic;color:#1f2937}
+section{padding:36px 0 8px;border-top:1px solid var(--rule);margin-top:36px}
+section h2{font-family:Inter,system-ui,sans-serif;font-weight:600;font-size:1.05rem;letter-spacing:.12em;text-transform:uppercase;color:var(--blue);margin:0 0 18px}
+section h3{font-weight:600;font-size:1.25rem;margin:26px 0 8px}
+p{margin:0 0 16px}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
+@media (max-width:720px){.two{grid-template-columns:1fr}}
+.fig{margin:18px 0;text-align:center}
+.fig img{max-width:100%;height:auto;background:#fff}
+.fig.framed img{border:1px solid var(--rule);border-radius:8px;padding:10px}
+.stat{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:14px;margin:18px 0}
+.stat div{background:var(--blue-soft);border-radius:12px;padding:16px 18px}
+.stat b{display:block;font:600 1.9rem/1.1 Inter,system-ui,sans-serif;color:var(--blue)}
+.stat span{font:.9rem Inter,system-ui,sans-serif;color:var(--muted)}
+table{border-collapse:collapse;width:100%;font-size:.95rem;margin:12px 0 20px}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--rule);vertical-align:top}
+th{font:600 .8rem Inter,system-ui,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+td.num{text-align:right;font-variant-numeric:tabular-nums}
+.bm{font-style:italic}
+.trace{background:#f8fafc;border:1px solid var(--rule);border-radius:12px;padding:18px 20px;font-size:.95rem}
+.trace .w{font-weight:600;color:var(--blue)}
+.trace .tag{display:inline-block;background:var(--blue-soft);color:var(--blue);border-radius:999px;padding:1px 9px;font:500 .78rem Inter,system-ui,sans-serif;margin-left:6px;vertical-align:middle}
+.trace .decree{background:#fff1ea;color:#9a3412}
+.trace ul{margin:8px 0 0;padding-left:1.2em}
+.trace li{margin:6px 0}
+.demo{border:1px solid var(--rule);border-radius:14px;overflow:hidden;box-shadow:0 12px 40px rgba(17,24,39,.08)}
+.demo iframe{display:block;width:100%;height:760px;border:0;background:#fff}
+audio{width:100%;margin:8px 0 6px}
+pre{background:#0f172a;color:#e2e8f0;border-radius:12px;padding:18px 20px;overflow-x:auto;font:.85rem/1.5 ui-monospace,Menlo,Consolas,monospace}
+.paper-card{display:grid;grid-template-columns:150px 1fr;gap:22px;align-items:start}
+.paper-card img{width:150px;border:1px solid var(--rule);border-radius:6px;box-shadow:0 8px 24px rgba(0,0,0,.08)}
+@media (max-width:560px){.paper-card{grid-template-columns:1fr}}
+footer{border-top:1px solid var(--rule);margin-top:48px;padding:26px 0 60px;color:var(--muted);font:.9rem Inter,system-ui,sans-serif;text-align:center}
+.gloss{font-size:.95rem;margin:14px 0 22px}
+.gloss .l{display:flex;flex-wrap:wrap;gap:0 18px}
+.gloss .l div{display:flex;flex-direction:column}
+.gloss .l div i{font-style:italic}
+.gloss .l div small{font:.78rem Inter,system-ui,sans-serif;color:var(--muted);letter-spacing:.02em}
+.gloss .t{margin-top:6px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>Baltmeri: Deterministic Synthesis of a Shared Language for the Baltic Sea from the Nine Languages of Its Shores</h1>
+  <p class="authors"><span>Martin Källström</span> &nbsp;·&nbsp; <span>Belinda Retourné</span></p>
+  <p class="affil">The Baltmeri Project &nbsp;·&nbsp; 2026</p>
+  <div class="buttons">
+    <a class="btn" href="paper/baltmeri-paper.pdf"><svg viewBox="0 0 24 24"><path d="M6 2h8l6 6v14H6zM13 3.5V9h5.5M8 13h8v1.5H8zm0 3h8v1.5H8z"/></svg>Paper (PDF)</a>
+    <a class="btn" href="https://github.com/martinkallstrom/baltmeri-translator"><svg viewBox="0 0 24 24"><path d="M12 .5A12 12 0 0 0 0 12.7c0 5.4 3.4 10 8.2 11.6.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.6-4-1.6-.6-1.4-1.4-1.8-1.4-1.8-1.1-.8.1-.8.1-.8 1.2.1 1.8 1.3 1.8 1.3 1.1 1.9 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.4-5.5-6.1 0-1.3.5-2.4 1.2-3.3-.1-.3-.5-1.6.1-3.3 0 0 1-.3 3.4 1.3a11.5 11.5 0 0 1 6.2 0c2.3-1.6 3.4-1.3 3.4-1.3.7 1.7.2 3 .1 3.3.8.9 1.2 2 1.2 3.3 0 4.7-2.8 5.8-5.5 6.1.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6A12 12 0 0 0 24 12.7 12 12 0 0 0 12 .5z"/></svg>Code</a>
+    <a class="btn" href="https://baltmeri-translator.kindship-ai.workers.dev"><svg viewBox="0 0 24 24"><path d="M4 12c3-4.5 8-4.5 12 0-4 4.5-9 4.5-12 0zm12 0l5-3.6v7.2zM8 11a1 1 0 1 0 0 .1z"/></svg>Live translator</a>
+    <a class="btn alt" href="baltmeri_manual.md"><svg viewBox="0 0 24 24"><path d="M4 4h10a4 4 0 0 1 4 4v12H8a4 4 0 0 0-4 4zm2 2v13.3A6 6 0 0 1 8 19h8V8a2 2 0 0 0-2-2z"/></svg>The Manual</a>
+  </div>
+</header>
+
+<figure class="teaser">
+  <img src="site/fig-map.svg" alt="Sketch of the nine coastal cities around Visby with 200, 400 and 600 km rings" width="560">
+  <figcaption><b>The Visby Queue.</b> When the four language families tie, the tie goes to the language whose nearest coastal city is closest to Visby, the Hanseatic hub in the middle of the sea. The winner then rotates to the back of the queue, so no language keeps winning.</figcaption>
+</figure>
+
+<p class="lead">Nine languages ring the Baltic Sea and none of them names it from the sea. Baltmeri is a language in which every word is decided by all nine at once, by a fixed and repeatable procedure. <span class="bm">Meri er men</span> — the sea is ours.</p>
+
+<section id="abstract">
+  <h2>Abstract</h2>
+  <p>The Baltic Sea is shared by nine languages of four families, none of which names it from the sea's own point of view, and all of which govern it together with limited success: it is the largest human-induced hypoxic area in the world, and regional institutions have not produced a regional identity. We present <b>Baltmeri</b>, a constructed language designed to be the sea's own voice, in which every word is decided by a fixed, repeatable procedure applied to Finnish, Estonian, Latvian, Lithuanian, Polish, Russian, Swedish, Danish and German.</p>
+  <p>Source words are normalised to a common inventory and reduced to consonant skeletons; words already shared across two families are inherited (the Hanse Rule); other content words are assigned to the family with the historically richest vocabulary for their semantic domain; function words and all inflections are decided by one-family-one-vote; ties are broken by the <i>Visby Queue</i>, rotating so that no language accumulates decisions. We describe the language's phonology, morphology, syntax and lexicon, and implement the procedure as a deterministic engine with a serialisable tie-break state. Re-deriving the founding Manual's 58 lexical decrees from their nine source forms, the engine reproduces 28; the Domain Rule is 95% reproducible, and the 30 divergences concentrate in the fill-in of shared words and the counting of ballots, locating exactly where editorial taste survived the algorithm.</p>
+  <p>We further present a public translator in which a large language model performs only source analysis and dictionary lookup, the engine derives and inflects every word, and a second model call writes an explanation grounded in the engine's trace, so that every Baltmeri word shows its work. We argue, drawing on thalassology, rights-of-nature law and the blue humanities, that an algorithmically synthesised regional language is a legitimate instrument of more-than-human representation: the people around the sea are its citizens.</p>
+</section>
+
+<section id="how">
+  <h2>How a word is decided</h2>
+  <div class="two">
+    <div>
+      <p>Every Baltmeri word is the output of one procedure run on a <i>concept</i>: a gloss, a part of speech, a semantic domain, and the first dictionary translation in each of the nine languages. The nine forms are normalised, stripped of their citation endings and reduced to <b>consonant skeletons</b> (voicing and palatalisation ignored), so that Danish <i>sild</i> and Polish <i>śledź</i> both become S-L-T and count as the same word.</p>
+      <p>The rules are then tried in order. If a skeleton is shared by two or more families the concept is a <b>Hanse word</b> and Baltmeri inherits it. Otherwise a content word goes to the family that owns its <b>domain</b>: the sea, fish, weather and landscape to Finnic; body, kinship, colour and farm to Baltic; trade, town, law and abstractions to Germanic; verbs and adjectives of quality to Slavic. Function words and every ending are put to a <b>family vote</b>, one family one vote. If two concepts collide, the later one takes its runner-up. A small set of <b>repair</b> rules removes clusters no coastal speaker would say.</p>
+    </div>
+    <figure class="fig">
+      <img src="site/fig-flow.svg" alt="Decision path: gather, Hanse, domain, family vote, fallback, collision, repair" width="380">
+      <figcaption>The decision path (Figure 2 of the paper).</figcaption>
+    </figure>
+  </div>
+
+  <h3>Example: <span class="bm">Peleekhüljei odpočiv kaljuil suvil.</span></h3>
+  <div class="gloss">
+    <div class="l">
+      <div><i>Peleek-hülje-i</i><small>grey-seal-PL</small></div>
+      <div><i>odpočiv</i><small>rest.3</small></div>
+      <div><i>kalju-i-l</i><small>rock-PL-ADE</small></div>
+      <div><i>suvi-l</i><small>summer-ADE</small></div>
+    </div>
+    <div class="t">‘Grey seals rest on the rocks in summer.’</div>
+  </div>
+  <div class="trace">
+    <ul>
+      <li><span class="w">hülje</span> “seal” <span class="tag">Rule 2 · Domain</span> No skeleton is shared (fi <i>hylje</i>, et <i>hüljes</i>, lv <i>ronis</i>, lt <i>ruonis</i>, pl <i>foka</i>, ru <i>тюлень</i>, sv/da <i>säl</i>, de <i>Robbe</i>). Sea animals belong to Finnic; Estonian ranks first: <i>hüljes</i> → <i>hülje</i>. With <i>peleek</i> “grey” (Baltic, colour) it forms the head-final compound for the species.</li>
+      <li><span class="w">odpočiv</span> “rest” <span class="tag">Rule 2 · Domain</span> A verb of action goes to Slavic; Polish ranks first: <i>odpoczywać</i> → <i>odpočiv</i>. Third person is unmarked for number.</li>
+      <li><span class="w">kaljuil</span> “on the rocks” <span class="tag">Rule 2 · Domain</span> Landscape is Finnic: Estonian <i>kalju</i>, then <i>-i</i> plural and <i>-l</i> adessive.</li>
+      <li><span class="w">sild</span> “herring” <span class="tag">Rule 1 · Hanse</span><span class="tag decree">manual decree</span> S-L-T is shared by Baltic, Slavic and Germanic. The families nominate <i>silk</i>, <i>sledz</i>, <i>sild</i>; the queue hands the tie to Latvian and the rules alone give <i>silk</i>. The Manual decrees <i>sild</i>, and the translator says so.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="results">
+  <h2>Results</h2>
+  <div class="two">
+    <div>
+      <p>Because the language is a procedure, its founding text can be tested against itself. We gave the engine the nine source forms for each of the Manual's 58 lexical decrees and ran the procedure in the Manual's order. It reproduces 28. The pattern is sharp: where the Manual assigns a word by semantic domain, the engine agrees 18 times out of 19; where a word is shared or voted, the author's hand shows. The 30 divergences fall into four classes, and ten of them are cases where the Manual protected the Finnic character of sea vocabulary against its own Hanse Rule.</p>
+      <div class="stat">
+        <div><b>28 / 58</b><span>manual decrees reproduced by the rules alone</span></div>
+        <div><b>95%</b><span>reproduction where the Domain Rule applies</span></div>
+        <div><b>33</b><span>tie-breaks by the Visby Queue in the seed lexicon</span></div>
+        <div><b>117</b><span>golden tests pinning every paradigm and divergence</span></div>
+      </div>
+    </div>
+    <figure class="fig">
+      <img src="site/fig-rules.svg" alt="Stacked bars: reproduced vs manual decree, by rule" width="360">
+      <figcaption>Reproduction by rule (Figure 3 of the paper).</figcaption>
+    </figure>
+  </div>
+  <h3>Family balance</h3>
+  <p>The design's central claim is equity between families. Germanic, with three members and by far the most speakers, supplies the fewest winning forms; Baltic, with the fewest speakers, supplies the most.</p>
+  <table>
+    <thead><tr><th>Family</th><th class="num">Wins</th><th>Deciding language</th><th class="num">Wins</th></tr></thead>
+    <tbody>
+      <tr><td>Baltic</td><td class="num">20</td><td>Polish</td><td class="num">15</td></tr>
+      <tr><td>Slavic</td><td class="num">18</td><td>Latvian</td><td class="num">14</td></tr>
+      <tr><td>Finnic</td><td class="num">15</td><td>Estonian</td><td class="num">13</td></tr>
+      <tr><td>Germanic</td><td class="num">10</td><td>Swedish</td><td class="num">8</td></tr>
+      <tr><td></td><td></td><td>Lithuanian · Russian · Danish · Finnish · German</td><td class="num">6 · 3 · 2 · 1 · 1</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="engine">
+  <h2>The translation engine</h2>
+  <div class="two">
+    <div>
+      <p>A language no one has spoken needs a way to be spoken. The translator's defining property is that <b>the language model never writes a Baltmeri word</b>. It analyses the source sentence into lemmas with grammatical features and supplies the nine dictionary forms for anything the lexicon does not know; a deterministic engine derives and inflects every word and records a trace; a second model call turns the trace into the “legend” shown beneath each translation. The legend is faithful by construction because it verbalises an executed derivation rather than reasoning about the translation.</p>
+      <p>New words are coined from the queue state the Manual leaves behind, and a word's first derivation is kept forever, so the lexicon grows without ever changing under anyone's feet.</p>
+    </div>
+    <figure class="fig">
+      <img src="site/fig-arch.svg" alt="Architecture: analysis LLM, deterministic engine, legend LLM, voice" width="420">
+      <figcaption>Orange: probabilistic. Blue: deterministic (Figure 4 of the paper).</figcaption>
+    </figure>
+  </div>
+  <h3>Try it</h3>
+  <p>Type in any of the nine languages or English. Click a word in the output to see the nine forms that voted, who won, and how the tie was broken.</p>
+  <div class="demo"><iframe src="https://baltmeri-translator.kindship-ai.workers.dev" title="Baltmeri translator" loading="lazy"></iframe></div>
+  <p style="text-align:center;margin-top:10px"><a href="https://baltmeri-translator.kindship-ai.workers.dev">Open the translator in a new tab →</a></p>
+  <h3>Listen</h3>
+  <p>The Manual's closing text, voiced by a multilingual model with no language setting: Baltmeri is not a language it knows, so it is left to decide how nine coastlines sound at once.</p>
+  <audio controls preload="none" src="site/baltmeri-text.mp3"></audio>
+  <p class="bm" style="color:var(--muted);font-size:.95rem">Baltmeri er ne glembok meri. Baltmerin vesi er ne müket solne, i talvil meril er jää. Daug kalai plav Baltmerise: räim, sild, tursk i lohi. Peleekhüljei ži saaril i kaljuil, i suvil de odpočiv päivel. Kalajai lov räima sügisl. Vakar de vidil daug hüljei meril. Home me žeglisme Gotlandile, i ja vidsu dzintara rannal. Ja kohu Baltmeria. Meri er zimne, ne glembok, i ne müket solne — ale meri er men.</p>
+</section>
+
+<section id="paper">
+  <h2>Paper</h2>
+  <div class="paper-card">
+    <a href="paper/baltmeri-paper.pdf"><img src="site/paper-page1.png" alt="First page of the paper"></a>
+    <div>
+      <p><b>Baltmeri: Deterministic Synthesis of a Shared Language for the Baltic Sea from the Nine Languages of Its Shores.</b> Martin Källström and Belinda Retourné. The Baltmeri Project, 2026. 19 pages, 90 references.</p>
+      <p>Sections: introduction and motivation · background (Circum-Baltic contact area, Hanseatic lexicon, zonal constructed languages, computational comparison, the sea as subject) · design goals · source languages and the Visby Queue · phonology and orthography · the synthesis procedure · morphology · syntax · lexicon · evaluation · the translation engine · discussion · appendices with the recipe card, the full seed lexicon with source forms, and the interlingua.</p>
+      <p><a href="paper/baltmeri-paper.pdf">Download the PDF</a> · <a href="https://github.com/martinkallstrom/baltmeri-translator/tree/main/docs/paper">LaTeX sources</a> · <a href="baltmeri_manual.md">The Manual</a> · <a href="decisions.md">Engine decisions</a></p>
+    </div>
+  </div>
+  <h3>Citation</h3>
+<pre>@techreport{kallstrom2026baltmeri,
+  title       = {Baltmeri: Deterministic Synthesis of a Shared Language
+                 for the Baltic Sea from the Nine Languages of Its Shores},
+  author      = {K{\"a}llstr{\"o}m, Martin and Retourn{\'e}, Belinda},
+  institution = {The Baltmeri Project},
+  year        = {2026},
+  url         = {https://github.com/martinkallstrom/baltmeri-translator}
+}</pre>
+</section>
+
+<footer>
+  Word forms are derived deterministically from the Baltmeri Manual. The translator's analysis and legend are written by Claude; the voice is Eleven Multilingual v2.<br>
+  <span class="bm">Meri er men.</span>
+</footer>
+</div>
+</body>
+</html>

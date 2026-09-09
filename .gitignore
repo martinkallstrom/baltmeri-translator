@@ -7,3 +7,5 @@ dist/
 .wrangler/
 .dev.vars
 worker-configuration.d.ts
+public/about/
+public/paper/
