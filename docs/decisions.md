@@ -11,7 +11,14 @@ does the following. Every decision is visible in the per-word trace in the UI.
   Affricates fold into their stop so that *śledź* → S-L-T matches *sild*.
 - Geminates collapse (*sill* → sil), multi-word citations fuse (*i går* → igor).
 - Citation endings are stripped from the raw word before normalization so Polish *-ć*
-  and Russian *-ть* are recognisable. Stems keep at least two letters (*być* → by).
+  and Russian *-ть* are recognisable. A stripped stem must keep at least two letters
+  and a vowel; otherwise the next, lighter ending pattern is tried (*być* → by,
+  *chować* → chow-, not *ch-*; *ssać* → ssa-, not *s-*).
+- Latvian and Lithuanian infinitives lose their theme vowel with the ending
+  (*zināt* → zin-, *stovėti* → stov-), so that verb stems are comparable with the
+  Slavic and Germanic ones.
+- Polish *rz* devoices to **š** after *p, t, k* (*przychodzić* → pšihodz-, *trzy* → tši),
+  as in Polish pronunciation; elsewhere it is ž.
 
 ## Hanse Rule matching (§3 Rule 1)
 
@@ -47,12 +54,28 @@ stem (*vid-l-me* → vidilme, *pospolit-st* → pospolitist). A final *-s* is to
 *ne* precedes the verb, except with the copula where it precedes the predicate, as in
 the manual's text (*Baltmeri er ne glembok meri*).
 
+## The seed lexicon: Manual, then Leipzig–Jakarta
+
+The seed lexicon has two blocks. The **Manual's** 58 decreed items (plus numerals six
+to ten and the derived words) are derived first, in the manual's order (§0, §3 → §11),
+from the initial queue. The **Leipzig–Jakarta list** — the 100 meanings found least
+borrowable across the World Loanword Database (Tadmor, Haspelmath & Taylor 2010) —
+is derived next, in list order, from the queue state the Manual leaves behind
+(`engine.manualQueue`). Sixteen of its meanings are already fixed by the Manual; the
+other 84 (`src/engine/core.ts`) have no manual decree: what the procedure yields is the
+word. Their nine source forms were written by hand as first-dictionary citation forms.
+
+The copula stems *es-* and *er* are registered as taken before anything is derived, so
+no later concept can coin them (the procedure alone would have made "to eat" *es-*,
+giving *esu* both "I am" and "I eat"; "eat" takes its runner-up, *söö-*).
+
 ## Derivation order and the Visby Queue
 
-The seed lexicon is derived once, in the manual's order (§0, §3 → §11), from the initial
-queue. The resulting queue state is the **canonical queue**. Every translation request
-starts a fresh queue from the canonical state and derives new concepts in order of first
-appearance in the request. A concept's first derivation is cached (Cloudflare KV) and
+The queue state after the whole seed lexicon (Manual + Leipzig–Jakarta) has been
+derived is the **canonical queue**. Every translation request starts a fresh queue from
+the canonical state and derives new concepts in order of first appearance in the
+request. (The paper, written before the core list was added, describes the post-Manual
+queue as canonical; that state is still recorded as `manualQueue`.) A concept's first derivation is cached (Cloudflare KV) and
 reused forever after, so a word never changes once it has been coined ("first
 derivation wins"), while two users translating different texts cannot perturb each
 other's tie-breaks.

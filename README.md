@@ -70,6 +70,23 @@ The engine reproduces 28 of the Manual's 58 lexical decrees from the rules
 alone; the other 30 are used as decreed and flagged as such in every trace.
 The list is pinned in `test/lexicon.test.ts` so it cannot drift silently.
 
+## The lexicon
+
+The seed lexicon has 153 words in two blocks:
+
+- **The Manual** (`src/engine/lexicon.ts`): the 58 items the Manual decrees, the
+  numerals six to ten, five derived words and *Baltmeri* itself.
+- **The Leipzig–Jakarta list** (`src/engine/core.ts`): the 100 meanings that the
+  World Loanword Database found most resistant to borrowing — fire, nose, to go,
+  water, mouth, tongue, blood, bone, … Sixteen are already fixed by the Manual;
+  the other 84 are derived by the procedure alone from hand-written source
+  forms, with no decree. *Nose* is *nos* (Baltic, Slavic and Germanic agree),
+  *bone* is *kaul*, *tongue* is *meel*, *child* is *barn*, *bird* is *ptak*, *star*
+  is *täht*, *who* is *kas* and *what* is *mis*.
+
+Every word beyond these is coined at translation time from nine dictionary
+forms supplied by the analysis model, and kept forever once coined.
+
 ## Repository layout
 
 ```
@@ -85,12 +102,13 @@ src/engine/               pure TypeScript, no dependencies — runs in the Worke
   repair.ts               §3 Rule 6
   inflect.ts              §4–§8 tables
   lexicon.ts              §12 seed lexicon with nine sources per entry, in Manual order
+  core.ts                 the Leipzig–Jakarta 100, derived after the Manual
   render.ts               analysed sentence → Baltmeri text with per-word trace
   parse.ts                Baltmeri → glossed analysis
 src/server/               Anthropic calls (structured outputs), KV cache, orchestration
 src/pages/                Astro UI and API routes (translate, tutorial, speak, lexicon)
 scripts/                  lexicon check, paper data and tables, site sync
-test/                     117 golden tests derived from the Manual
+test/                     133 golden tests derived from the Manual and the core list
 ```
 
 ## Develop
@@ -102,7 +120,7 @@ ElevenLabs API key.
 npm install
 cp .env.example .env        # fill in ANTHROPIC_API_KEY and ELEVENLABS_API_KEY
 cp .env .dev.vars           # wrangler dev reads this
-npm test                    # engine golden tests
+npm test                    # 133 engine golden tests
 npm run check               # astro type check
 npm run build && npm run preview   # http://localhost:8787
 ```
@@ -110,7 +128,8 @@ npm run build && npm run preview   # http://localhost:8787
 Useful scripts:
 
 ```bash
-npx tsx scripts/check-lexicon.ts   # every seed entry: manual form vs engine form
+npx tsx scripts/check-lexicon.ts   # every Manual entry: manual form vs engine form
+npx tsx scripts/check-core.ts      # the Leipzig–Jakarta derivations
 npx tsx scripts/paper-data.ts      # the statistics quoted in the paper
 ```
 
@@ -146,11 +165,40 @@ committed. Tables and figures are generated from the engine's own output.
 }
 ```
 
+## Future work
+
+Where we would go from here, roughly in order of what would matter most.
+
+1. **A second edition of the Manual.** Thirty of its 58 words are decrees the
+   procedure cannot reproduce, concentrated in the fill-in of shared words and
+   the counting of ballots. Adopting the engine's fill-in rule (and accepting
+   *silk* and *penki*), or stating Domain-before-Hanse precedence explicitly,
+   would make the language deterministic to the last letter.
+2. **Intelligibility studies.** Interslavic measured 84% passive comprehension
+   with cloze tests. Baltmeri has not yet been read by a Latvian or a Pole. A
+   small online cloze study across the nine languages would show whether the
+   family-balance design produces something readable around the sea, and it is
+   the paper's missing empirical section.
+3. **A community dictionary.** A form where speakers of the nine languages
+   submit and dispute source forms, with "first derivation wins" as a public
+   record of who coined what — citizens of the Baltic voting words into
+   existence. Technically a review queue and a KV write; socially the whole
+   project.
+4. **Widen the seed further.** The Leipzig–Jakarta core is in; the Swadesh 207
+   list and a maritime and ecological vocabulary (species, weather, seabed,
+   pollution, governance) are the obvious next blocks, again with hand-written
+   source forms.
+5. **Smaller items.** Defend or fix the Manual's non-geodesic Visby Queue
+   (Klaipėda is nearer than Riga; Kaliningrad would move Russian to third). A
+   corpus page for texts written in the language. A preprint with a DOI on
+   Zenodo or arXiv for the CITATION file to point to. A spoken-form study of
+   what accent nine coastlines produce when no one is in charge.
+
 ## Contributing
 
 The most useful contributions are to the **lexicon**: better first-dictionary
 translations for the nine languages, or new concepts with their nine forms and
-a domain. Add them to `src/engine/lexicon.ts`, run `npm test`, and if an entry's
+a domain. Add them to `src/engine/core.ts` (or `lexicon.ts` for Manual items), run `npm test`, and if an entry's
 derivation changes, update the pinned divergence list in `test/lexicon.test.ts`
 and say why in the pull request. Interpretive changes to the rules belong in
 `docs/decisions.md` as well as in code.

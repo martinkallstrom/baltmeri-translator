@@ -178,5 +178,6 @@ export const FIXED: FixedEntry[] = [
 export const ALIASES: Record<string, string> = {
   day: "sun", ocean: "sea", kind: "sort", variety: "sort", type: "sort", large: "big", little: "small", cliff: "rock",
   "he/she/it": "he", she: "he", it: "he", "you (plural)": "you-pl", "you.pl": "you-pl", baltic: "baltic-sea", "baltic sea": "baltic-sea",
-  "the baltic": "baltic-sea", herring: "herring", "atlantic herring": "herring", strömming: "baltic-herring", fisherman: "fisher", fishermen: "fisher"
+  "the baltic": "baltic-sea", herring: "herring", "atlantic herring": "herring", strömming: "baltic-herring", fisherman: "fisher", fishermen: "fisher",
+  stone: "rock", foot: "leg", arm: "hand", flesh: "meat", do: "make", earth: "soil", ground: "soil", weep: "cry", crush: "grind", shade: "shadow", beat: "hit", distant: "far", broad: "wide", chest: "breast"
 };

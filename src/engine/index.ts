@@ -1,6 +1,7 @@
 /** The Baltmeri engine: derives the seed lexicon in the manual's order, then serves words. */
 import { LANGS, type Lang, type Pos } from "./languages";
 import { ALIASES, DERIVED, FIXED, LEXICON } from "./lexicon";
+import { LEIPZIG_JAKARTA } from "./core";
 import { derive, type DerivationKind } from "./inflect";
 import { newContext, synthesize, type Concept, type Derivation, type SynthesisContext } from "./synthesize";
 
@@ -14,22 +15,32 @@ export interface Word {
   derivedFrom?: { from: string; kind: DerivationKind; steps: string[] };
   fixedNote?: string;
   /** Where this word came from. */
-  origin: "manual" | "derived" | "fixed" | "new";
+  origin: "manual" | "core" | "derived" | "fixed" | "new";
 }
 
 export class Engine {
   readonly words = new Map<string, Word>();
   readonly derivations: Derivation[] = [];
-  /** The Visby Queue state after the whole manual has been derived. */
+  /** The Visby Queue state after the Manual alone has been derived. */
+  readonly manualQueue: Lang[];
+  /** The Visby Queue state after the whole seed lexicon (Manual + Leipzig–Jakarta): the start state for new words. */
   readonly canonicalQueue: Lang[];
   private readonly taken: Map<string, string>;
 
   constructor() {
     const ctx = newContext();
+    // The copula's stems are words of the language (§7) and must not be coined again.
+    ctx.taken.set("es", "be"); ctx.taken.set("er", "be");
     for (const c of LEXICON) {
       const d = synthesize(c, ctx);
       this.derivations.push(d);
       this.words.set(c.id, { id: c.id, pos: c.pos, gloss: c.gloss ?? c.id, stem: d.form, derivation: d, origin: "manual" });
+    }
+    this.manualQueue = ctx.queue.snapshot();
+    for (const c of LEIPZIG_JAKARTA) {
+      const d = synthesize(c, ctx);
+      this.derivations.push(d);
+      this.words.set(c.id, { id: c.id, pos: c.pos, gloss: c.gloss ?? c.id, stem: d.form, derivation: d, origin: "core" });
     }
     for (const e of DERIVED) {
       const base = this.words.get(e.from)!;

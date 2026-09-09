@@ -26,7 +26,7 @@ const RULES: Record<Lang, Rule[]> = {
     [/dž/g, "dz"], [/c/g, "ts"]
   ],
   pl: [
-    [/ch/g, "h"], [/cz/g, "č"], [/sz/g, "š"], [/rz/g, "ž"], [/ż/g, "ž"], [/dź/g, "dz"], [/dż/g, "dz"],
+    [/ch/g, "h"], [/cz/g, "č"], [/sz/g, "š"], [/(?<=[ptk])rz/g, "š"], [/rz/g, "ž"], [/ż/g, "ž"], [/dź/g, "dz"], [/dż/g, "dz"],
     [/ć/g, "ts"], [/ś/g, "s"], [/ź/g, "z"], [/ń/g, "n"], [/ł/g, "l"], [/ó/g, "o"], [/w/g, "v"],
     [/ę(?=[bp])/g, "em"], [/ę(?=[bcdfghjklmnrstvzčšž])/g, "en"], [/ę/g, "e"],
     [/ą(?=[bp])/g, "am"], [/ą(?=[bcdfghjklmnrstvzčšž])/g, "an"], [/ą/g, "a"],
@@ -121,11 +121,15 @@ export function skeletonsMatch(a: string[], b: string[]): boolean {
 }
 
 const MIN_STEM = 2;
+const HAS_VOWEL = /[aeiouyäöüõåæøāēīūōąęėįųóаеёиоуыэюя]/i;
 
+/** Strip the first matching ending whose remainder is still a pronounceable stem (≥2 letters with a vowel). */
 function stripOnce(s: string, patterns: RegExp[]): string {
   for (const re of patterns) {
     const m = s.match(re);
-    if (m && s.length - m[0].length >= MIN_STEM) return s.slice(0, s.length - m[0].length);
+    if (!m) continue;
+    const rest = s.slice(0, s.length - m[0].length);
+    if (rest.length >= MIN_STEM && HAS_VOWEL.test(rest)) return rest;
   }
   return s;
 }
@@ -142,8 +146,8 @@ export function stripCitation(lang: Lang, pos: Pos, raw: string): string {
       case "de": return stripOnce(s, [/en$/, /n$/]);
       case "fi": return stripOnce(s, [/[aä]$/]);
       case "et": return stripOnce(s, [/ma$/]);
-      case "lv": return stripOnce(s, [/ties$/, /t$/]);
-      case "lt": return stripOnce(s, [/tis$/, /ti$/]);
+      case "lv": return stripOnce(s, [/[āēī]ties$/, /ties$/, /[āēī]t$/, /t$/]);
+      case "lt": return stripOnce(s, [/[ėyo]tis$/, /tis$/, /uoti$/, /[ėyo]ti$/, /ti$/]);
       case "pl": return stripOnce(s, [/ować$/, /ieć$/, /[aeiyą]ć$/, /ć$/]);
       case "ru": {
         const t = stripOnce(s, [/ться$/, /ть$/, /ти$/, /t'sja$/, /t'$/, /tʹ$/, /ti$/]);
