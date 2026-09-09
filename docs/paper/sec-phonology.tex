@@ -1,0 +1,65 @@
+\section{Phonology and orthography}\label{sec:phonology}
+
+\subsection{Inventory}
+Baltmeri admits only sounds that at least three of the nine languages share comfortably. The consonant inventory is
+\begin{quote}
+p t k b d g m n l r s š z ž v j h ts dz
+\end{quote}
+to which the derived lexicon adds \emph{č} (from Polish \emph{cz}, Baltic \emph{č}, Russian \emph{ч}: \emph{četri} ``four'', \emph{odpočiv-} ``rest'') and \emph{f} in a handful of Germanic-won forms (\emph{fem} ``five''). Both are tolerated as marginal segments. The vowels are \emph{a e i o u ä ö ü}; length is phonemic and written by doubling (\emph{jää} ``ice'', \emph{lääs} ``west'', \emph{juus} ``you (pl.)''). Orthography is one letter per segment, with the Estonian--Latvian--Lithuanian convention for \emph{š ž č} and the Finnish--Estonian--German--Swedish convention for the front rounded vowels; no source language has to learn a new letter shape.
+
+\subsection{Stress}
+Stress falls on the first syllable. Finnish, Estonian and Latvian have fixed initial stress; Lithuanian native words and most German and Swedish simplex words lean that way; no family strongly objects. Initial stress interacts with the morphology: since all inflection is suffixal, the stressed stem is never obscured by an ending.
+
+\subsection{The Normalization Table}\label{sec:normalization}
+Every source word passes through an ordered rewrite table before it takes part in any decision (Table~\ref{tab:normalization}). The table maps each language's orthography onto the Baltmeri inventory. Its purpose is not phonetic accuracy but \emph{comparability}: after normalization, Swedish \emph{båt}, Danish \emph{båd}, German \emph{Boot} and Estonian \emph{paat} can be recognised as one word. Suprasegmentals that no other family shares---Danish \emph{stød}, Swedish pitch accent, Russian vowel reduction---are ignored, and voiced final obstruents stay voiced (\emph{duž} ``big'').
+
+\begin{table}[t]
+\centering\small
+\caption{The Normalization Table (\S2 of the Manual), as implemented. Rules apply in order within a language.}
+\label{tab:normalization}
+\setlength{\tabcolsep}{4pt}
+\begin{tabular}{@{}p{3.4cm}p{1.5cm}p{2.5cm}@{}}
+\toprule
+Source feature & Becomes & Example \\
+\midrule
+sv/da \emph{å}; fi/et \emph{oo} & o / oo & \emph{båt} $\rightarrow$ bot \\
+sv/de \emph{y}; fi/et \emph{y/ü}; de \emph{ü} & ü & \emph{yksi} $\rightarrow$ üksi \\
+et \emph{õ} & ö & \emph{võrk} $\rightarrow$ vörk \\
+lv/lt macrons, nasal vowels & doubled vowel & \emph{jūs} $\rightarrow$ juus \\
+pl \emph{ę, ą} before C & en, an (em, am before b/p) & \emph{głęboki} $\rightarrow$ glembok \\
+pl \emph{cz}, ru \emph{ч} & č & \emph{cztery} $\rightarrow$ čteri \\
+pl \emph{sz}, ru \emph{ш} & š & \emph{szary} $\rightarrow$ šar \\
+pl \emph{ż/rz}, ru \emph{ж} & ž & \emph{żeglować} $\rightarrow$ žegl- \\
+pl \emph{ł}, ru dark \emph{l} & l & \emph{pływać} $\rightarrow$ plav- \\
+pl/ru palatalisation (\emph{ś ń ź ь}) & dropped & \emph{sól} $\rightarrow$ sol \\
+de \emph{ch, sch} & h, š & \emph{Sprache} $\rightarrow$ sprahe \\
+de \emph{z, tz}; lv/lt \emph{c} & ts & \emph{Salz} $\rightarrow$ salts \\
+lv \emph{dz}, lt \emph{dž} & dz & \emph{dzintars} $\rightarrow$ dzintar \\
+Geminates & single & \emph{sill} $\rightarrow$ sil \\
+Multi-word citations & fused & \emph{i går} $\rightarrow$ igor \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Consonant skeletons}\label{sec:skeleton}
+The currency of the whole system is the \emph{consonant skeleton}: the sequence of a normalized word's consonants with voicing and palatalisation ignored. We group segments into eleven classes (Table~\ref{tab:classes}). Affricates fold into their stop, so Polish \emph{śledź} ($\rightarrow$ \emph{sledz}) and Danish \emph{sild} share the skeleton S-L-T and count as ``the same word'' even though no listener would guess it by ear. The skeleton is a deliberately coarse similarity measure in the tradition of sound-class comparison in computational historical linguistics (\S\ref{sec:related-comp}); it trades phonetic detail for robustness to the vowel changes, gradation and umlaut that separate cognates and old loans around the Baltic.
+
+\begin{table}[t]
+\centering\small
+\caption{Skeleton classes. \emph{j} is treated as a semivowel for cluster purposes (\S\ref{sec:repair}).}
+\label{tab:classes}
+\begin{tabular}{@{}ll@{}}
+\toprule
+Class & Segments \\
+\midrule
+P & p b f \\
+T & t d ts dz \\
+K & k g \\
+S & s z š ž \\
+Č & č \\
+M, N, L, R, V, J, H & m; n; l; r; v; j; h \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Two skeletons \emph{match} if they have the same length and differ in at most one position. We restrict the one-position tolerance to skeletons of three or more consonants: for one- and two-consonant skeletons a differing position would match almost anything (S-L ``salt'' would match S-R ``island''), and the Manual's own examples of tolerated difference (\emph{dzintar}/\emph{gintar}/\emph{jantar}, \emph{četri}/\emph{keturi}) all involve three or four consonants. This threshold is the single most consequential interpretive decision in the implementation, and we return to it in \S\ref{sec:eval}.

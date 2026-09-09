@@ -1,0 +1,75 @@
+\documentclass[10pt,twocolumn]{article}
+\usepackage[a4paper,margin=1.9cm,top=2.2cm,bottom=2.2cm,columnsep=0.75cm]{geometry}
+\usepackage{fontspec}
+\setmainfont{Charter}
+\setsansfont{Helvetica Neue}
+\setmonofont{Menlo}[Scale=0.82]
+\newfontfamily\stixfont{STIX Two Text}
+\usepackage{microtype}
+\usepackage{tikz}
+\usetikzlibrary{arrows.meta,positioning,shapes.geometric,calc}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\usepackage{booktabs}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{amssymb}
+\usepackage{gb4e}\noautomath
+\usepackage{enumitem}
+\setlist{nosep,leftmargin=*}
+\usepackage[round,authoryear]{natbib}
+\setcitestyle{aysep={},notesep={: }}
+\usepackage[hidelinks]{hyperref}
+\usepackage{titlesec}
+\titleformat{\section}{\large\bfseries\sffamily}{\thesection}{0.7em}{}
+\titleformat{\subsection}{\normalsize\bfseries\sffamily}{\thesubsection}{0.6em}{}
+\titlespacing*{\section}{0pt}{1.4ex plus .5ex}{0.7ex}
+\titlespacing*{\subsection}{0pt}{1.1ex plus .4ex}{0.4ex}
+\usepackage{caption}
+\captionsetup{font=small,labelfont={bf,sf},labelsep=period}
+\usepackage{fancyhdr}
+\pagestyle{fancy}\fancyhf{}
+\fancyhead[L]{\small\sffamily Källström \& Retourné}
+\fancyhead[R]{\small\sffamily Baltmeri: a deterministically synthesised language for the Baltic Sea}
+\fancyfoot[C]{\small\thepage}
+\renewcommand{\headrulewidth}{0.3pt}
+\usepackage{abstract}
+\renewcommand{\abstractnamefont}{\sffamily\bfseries\small}
+\renewcommand{\abstracttextfont}{\small}
+\setlength{\parskip}{0pt}
+\hyphenation{Balt-meri}
+
+\title{\sffamily\bfseries\LARGE Baltmeri: Deterministic Synthesis of a Shared Language for the Baltic Sea from the Nine Languages of Its Shores}
+\author{\sffamily Martin Källström \and \sffamily Belinda Retourné}
+\date{\sffamily\small The Baltmeri Project · September 2026}
+
+\begin{document}
+\twocolumn[
+\begin{@twocolumnfalse}
+\maketitle
+\begin{abstract}
+\noindent The Baltic Sea is shared by nine languages of four families, none of which names it from the sea's own point of view, and all of which govern it together with limited success: it is the largest human-induced hypoxic area in the world, and regional institutions have not produced a regional identity. We present \textbf{Baltmeri}, a constructed language designed to be the sea's own voice, in which every word is decided by a fixed, repeatable procedure applied to Finnish, Estonian, Latvian, Lithuanian, Polish, Russian, Swedish, Danish and German. Source words are normalised to a common inventory and reduced to consonant skeletons; words already shared across two families are inherited (the Hanse Rule); other content words are assigned to the family with the historically richest vocabulary for their semantic domain; function words and all inflections are decided by one-family-one-vote; ties are broken by the \emph{Visby Queue}, a ranking of the nine languages by distance from the medieval Hanseatic hub, rotating so that no language accumulates decisions. We describe the language's phonology, morphology, syntax and lexicon, and implement the procedure as a deterministic engine with a serialisable tie-break state. Re-deriving the founding Manual's 58 lexical decrees from their nine source forms, the engine reproduces 28; the Domain Rule is 95\% reproducible, and the 30 divergences concentrate in the fill-in of shared words and the counting of ballots, locating exactly where editorial taste survived the algorithm. The seed lexicon is balanced across families, with the three-member Germanic family winning least. We further present a public translator in which a large language model performs only source analysis and dictionary lookup, the engine derives and inflects every word, and a second model call writes an explanation grounded in the engine's trace, so that every Baltmeri word shows its work. We argue, drawing on thalassology, rights-of-nature law and the blue humanities, that an algorithmically synthesised regional language is a legitimate instrument of more-than-human representation: the people around the sea are its citizens, and \emph{Meri er men}, ``the sea is ours'', is true by construction.\par\smallskip\noindent
+\textbf{Keywords:} constructed languages; zonal auxiliary languages; Circum-Baltic languages; language contact; consonant skeletons; deterministic lexicogenesis; rights of nature; Baltic Sea; neurosymbolic translation
+\end{abstract}
+\vspace{1.2em}
+\end{@twocolumnfalse}
+]
+
+\input{sec-intro}
+\input{sec-related}
+\input{sec-design}
+\input{sec-phonology}
+\input{sec-procedure}
+\input{sec-morphology}
+\input{sec-syntax}
+\input{sec-lexicon}
+\input{sec-evaluation}
+\input{sec-engine}
+\input{sec-discussion}
+
+\bibliographystyle{plainnat}
+\small
+\bibliography{refs}
+\normalsize
+\input{sec-appendix}
+\end{document}

@@ -1,0 +1,49 @@
+\section{The translation engine}\label{sec:engine}
+
+A language no one has spoken needs a way to be spoken. We built a public translator between Baltmeri and the nine coastal languages (plus English as a pivot) whose defining property is that \emph{the language model never writes a Baltmeri word}. Figure~\ref{fig:arch} shows the architecture.
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[font=\tiny,node distance=2.5mm and 3mm,>=Stealth,
+  llm/.style={draw,rounded corners=3pt,fill=orange!12,align=center,inner sep=3pt},
+  det/.style={draw,rounded corners=3pt,fill=blue!10,align=center,inner sep=3pt},
+  io/.style={draw,rounded corners=8pt,fill=white,align=center,inner sep=3pt}]
+  \node[io] (src) {source text\\(any of nine languages, or English)};
+  \node[llm,below=of src] (an) {\textbf{Analysis} (LLM, constrained JSON)\\lemmas + case · number · tense · person\\+ nine dictionary forms for unknown lemmas};
+  \node[det,below=of an] (eng) {\textbf{Engine} (deterministic)\\derive new stems (Rules 0--6)\\inflect · order · repair $\rightarrow$ trace};
+  \node[io,below=of eng] (out) {Baltmeri text + per-word trace};
+  \node[llm,right=of eng] (leg) {\textbf{Legend} (LLM)\\verbalises\\the trace};
+  \node[det,right=of out] (tts) {\textbf{Voice}\\multilingual TTS};
+  \node[det,left=of eng,text width=1.3cm] (kv) {cache: first derivation wins};
+  \draw[->] (src)--(an); \draw[->] (an)--(eng); \draw[->] (eng)--(out);
+  \draw[->] (eng.east)--(leg.west); \draw[->] (out.east)--(tts.west);
+  \draw[<->] (eng.west)--(kv.east);
+\end{tikzpicture}
+\caption{Architecture. Orange: probabilistic (language model); blue: deterministic. The model analyses and explains; the engine decides.}
+\label{fig:arch}
+\end{figure}
+
+\subsection{Division of labour}
+The design follows a line of work showing that large language models translate natural language into structured intermediate representations far more reliably than they execute the subsequent steps, and that delegating execution to a deterministic interpreter improves both accuracy and the faithfulness of explanations \citep{gao2023,lyu2023,pan2023,olausson2023,cheng2023}. The case is especially strong for morphology: wug-test studies find that language models ``massively underperform purpose-built systems'' at inflecting novel words, that success tracks community size and data availability rather than grammatical knowledge, and that even given a complete grammar book models apply rules only partially \citep{weissweiler2023,pantelidou2026,tanzer2024,bean2024}. A constructed language with no corpus is the worst case for such a model and the best case for a rule engine, whose ordered rewrite rules are total and predictable \citep{kaplan1994}. Corpus-based machine translation is simply unavailable: there is no parallel text \citep{nllb2024}.
+
+\paragraph{Analysis.} The model receives the source text, a compact statement of Baltmeri syntax and case semantics, and the list of known lexicon identifiers. It returns, under a JSON schema enforced by constrained decoding \citep{willard2023,geng2023}, a sequence of word specifications---lemma, part of speech, case, number, degree, tense, person, compound and derivation flags---already in Baltmeri order, plus a \emph{newConcepts} list giving, for every lemma the engine does not know, the first dictionary translation in each of the nine languages in native orthography, a part of speech and a domain. This is an interlingua in the classical sense \citep{hutchins1992}, closest to the abstract syntax of Grammatical Framework \citep{ranta2011}, with the model in the role of the parser and the engine in the role of the concrete-syntax lineariser; the generation side is a rule pipeline of the Apertium kind \citep{forcada2011}. Following \citet{tam2024}, the format constraint is confined to the analysis payload; the model is never asked to reason inside the constrained call about how a word should be derived.
+
+\paragraph{Derivation and rendering.} The engine starts a fresh queue from the canonical state, derives new concepts in order of first appearance, checks each form for collisions against the whole coined lexicon, inflects every word from the tables in \S\ref{sec:morphology}, inserts \emph{ne} and \emph{li}, capitalises and punctuates. Every token carries a trace: source forms, skeletons, rule, family, deciding language, queue before and after, repairs, and whether the form is a manual decree.
+
+\paragraph{Legend.} A second model call receives the source, the Baltmeri and the trace, and writes the explanatory ``legend'' shown beneath the translation. Because it verbalises an executed trace rather than reasoning about the translation, the legend is faithful by construction in the sense of \citet{jacovi2020}; free-text self-explanations, by contrast, are known to misrepresent a model's actual process \citep{turpin2023}. The legend is instructed to say plainly where the Manual decreed a form over its own rules.
+
+\paragraph{Reverse direction and voice.} Baltmeri to natural language runs the tables backwards: a parser indexes every inflected form of every known stem (about 40 forms per noun, 16 per verb), glosses each token with lemma and features, and the model renders the gloss into the target language with its own legend. Spoken output uses a multilingual neural voice with \emph{no language code}: Baltmeri is not a supported language, and since its orthography is a Finnic--Baltic--Slavic blend, forcing any single language's phonology would bias the accent.
+
+\subsection{Deployment and behaviour}
+The system runs as a single edge worker with a key--value store for the first-derivation-wins cache, analyses and legends. Typical latency is 7--11 seconds for a sentence, dominated by the analysis call. Figure~\ref{fig:ui} shows the interface on the Manual's second sentence. In use, the visible marking of new words (wavy underline) and manual decrees (in the trace) has proved to be the feature users engage with most: the language's accountability is its interface.
+
+\begin{figure}[t]
+\centering
+\fbox{\parbox{0.93\linewidth}{\small\ttfamily
+\textbf{Grey seals rest on the rocks in summer.}\\[2pt]
+$\rightarrow$ Peleekhüljei odpočiv kaljuil suvil.\\[4pt]
+\rmfamily\footnotesize
+\textbf{Legend.} The sentence keeps its SVO shape, with place before time, and the two location words both end in \emph{-l}, the case that means ``on/at/when''. \emph{Peleekhüljei}: no skeleton was shared, so the Domain Rule stepped in: sea belongs to Finnic, Estonian ranks first, \emph{hüljes} $\rightarrow$ \emph{hülje}; the head-final compound \emph{peleek} + \emph{hülje}; \emph{-i} plural. \emph{odpočiv}: a verb of action, Slavic, Polish first: \emph{odpoczywać} $\rightarrow$ \emph{odpočiv}; third person takes a zero ending. \emph{kaljuil}: landscape is Finnic, Estonian \emph{kalju}; \emph{-i} plural, \emph{-l} on. \emph{suvil}: seasons are Finnic, Estonian \emph{suvi}; \emph{-l} here does its ``when'' duty. No Visby Queue tie-breaks were needed.}}
+\caption{Translator output for the Manual's second sentence: the translation (main field) and the model-written legend grounded in the engine's trace.}
+\label{fig:ui}
+\end{figure}

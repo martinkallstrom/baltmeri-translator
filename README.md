@@ -34,7 +34,9 @@ The reverse direction parses Baltmeri against the grammar tables and the known
 lexicon, then Claude renders the gloss into the target language with its own legend.
 
 Interpretations of the manual and the derivation-order decision are recorded in
-[`docs/decisions.md`](docs/decisions.md).
+[`docs/decisions.md`](docs/decisions.md). The language, its construction and the
+engine are described in full in the paper
+[`docs/paper/baltmeri-paper.pdf`](docs/paper/baltmeri-paper.pdf).
 
 ## Layout
 

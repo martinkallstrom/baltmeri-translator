@@ -1,0 +1,119 @@
+\section{The synthesis procedure}\label{sec:procedure}
+
+Every Baltmeri word is the output of the procedure in Algorithm~\ref{alg:synth}, run on a \emph{concept}: an English gloss, a part of speech, a semantic domain, and the first dictionary translation in each of the nine languages. The rules are tried in order and the first that yields an answer wins. Figure~\ref{fig:flow} shows the same procedure as a decision path.
+
+\begin{algorithm}[t]
+\caption{Lexicogenesis: Rules 0--6 of the Manual.}
+\label{alg:synth}
+\begin{algorithmic}[1]
+\Require concept $c$ with sources $s_\ell$ for $\ell \in L$; queue $Q$; taken forms $T$
+\State \textbf{Gather:} for each $\ell$: strip citation ending, normalize, $\sigma_\ell \gets$ skeleton \Comment{Rule 0}
+\State cluster the $\sigma_\ell$ by \textsc{match}; let $C^\ast$ be the cluster spanning most families
+\If{$C^\ast$ spans $\geq 2$ families} \Comment{Rule 1, Hanse}
+  \State each family in $C^\ast$ nominates its front-ranked member's stem
+  \State $w \gets$ plurality; ties broken by $Q.\textsc{break}$ (winner rotates to back)
+\ElsIf{$c$ is a content word with domain $d$} \Comment{Rule 2, Domain}
+  \State $F \gets \textsc{family}(d)$; $w \gets$ stem of the front-ranked member of $F$ with a form
+\Else \Comment{Rule 3, Family Vote}
+  \State each family casts a ballot iff its members' skeletons match (else abstains)
+  \State pool ballots by \textsc{match}; $w \gets$ plurality; ties by $Q.\textsc{break}$
+  \If{every family abstained} $w \gets$ form of $Q.\textsc{fallback}$ \Comment{Rule 4}
+  \EndIf
+\EndIf
+\If{$w \in T$} $w \gets$ next candidate not in $T$ \Comment{Rule 5, Collision}
+\EndIf
+\State $T \gets T \cup \{w\}$; \Return $w$ (Repair, Rule 6, is applied when suffixes attach)
+\end{algorithmic}
+\end{algorithm}
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[font=\scriptsize,node distance=4mm,
+  box/.style={draw,rounded corners=2pt,fill=blue!6,minimum width=2.4cm,align=center,inner sep=3pt},
+  dec/.style={draw,diamond,aspect=2.6,fill=white,align=center,inner sep=1pt},
+  res/.style={draw,fill=blue!20,rounded corners=2pt,align=center,inner sep=3pt},
+  >=Stealth]
+  \node[box] (g) {Rule 0 · Gather\\strip · normalize · skeleton};
+  \node[dec,below=of g] (h) {skeleton shared\\by $\geq$2 families?};
+  \node[res,right=6mm of h] (ho) {Rule 1 · Hanse\\family vote on stem};
+  \node[dec,below=of h] (d) {content word\\with domain?};
+  \node[res,right=6mm of d] (do) {Rule 2 · Domain\\front-ranked member};
+  \node[dec,below=of d] (v) {any family\\votes?};
+  \node[res,right=6mm of v] (vo) {Rule 3 · Family vote};
+  \node[res,below=of v] (f) {Rule 4 · Fallback\\queue head with a form};
+  \node[box,below=of f] (c) {Rule 5 · Collision $\rightarrow$ runner-up};
+  \node[box,below=of c] (r) {Rule 6 · Repair (after suffixes)};
+  \draw[->] (g)--(h); \draw[->] (h)--node[above]{yes}(ho); \draw[->] (h)--node[right]{no}(d);
+  \draw[->] (d)--node[above]{yes}(do); \draw[->] (d)--node[right]{no}(v);
+  \draw[->] (v)--node[above]{yes}(vo); \draw[->] (v)--node[right]{no}(f);
+  \draw[->] (f)--(c); \draw[->] (c)--(r);
+  \draw[->,dashed] (ho.east) -- ++(0.35,0) |- (c.east);
+  \draw[->,dashed] (do.east) -- ++(0.35,0) |- (c.east);
+  \draw[->,dashed] (vo.east) -- ++(0.35,0) |- (c.east);
+  \node[below=2mm of r,align=center,text width=6cm,text=blue!60!black] {ties $\rightarrow$ Visby Queue; the decider rotates to the back (Rota Rule)};
+\end{tikzpicture}
+\caption{The decision path of the synthesis procedure.}
+\label{fig:flow}
+\end{figure}
+
+\subsection{Rule 0: Gather}
+Citation-form endings are stripped before normalization so that they are still recognisable: Swedish/Danish infinitive \emph{-a/-e}, German \emph{-en}, Finnish \emph{-a/-ä}, Estonian \emph{-ma}, Latvian \emph{-t}, Lithuanian \emph{-ti}, Polish \emph{-ć} with its theme vowel, Russian \emph{-ть}; nominal endings Latvian \emph{-s/-a}, Lithuanian \emph{-as/-is/-a}, and Polish/Russian gender vowels. Stems keep at least two letters, so Polish \emph{być} yields \emph{by-} rather than \emph{b-}. Polish \emph{kochać} $\rightarrow$ \emph{koch} $\rightarrow$ \emph{koh}; \emph{odpoczywać} $\rightarrow$ \emph{odpočiv}; Latvian \emph{pelēks} $\rightarrow$ \emph{peleek}.
+
+\subsection{Rule 1: the Hanse Rule}
+If the same skeleton appears in two or more families, the concept is a \emph{Hanse word}---something that has already crossed the sea on its own---and Baltmeri takes it. \emph{Herring}: Danish \emph{sild}, Polish \emph{śledź}, Russian \emph{сельдь} all give S-L-T, and Latvian \emph{siļķe}/Lithuanian \emph{silkė} give S-L-K, one position away; three families share the skeleton. \emph{Salt}: Finnish \emph{suola}, Estonian \emph{sool}, Polish \emph{sól}, Russian \emph{соль} share S-L. \emph{Amber}: Latvian \emph{dzintars}, Lithuanian \emph{gintaras}, Russian \emph{янтарь} share T/K/J-N-T-R with one differing onset.
+
+The Manual says the vowels and any disputed consonant are ``filled in by family vote, ties by the Visby Queue''. We implement this as a vote on whole stems: each supporting family nominates its front-ranked member's normalized stem, plurality wins, ties go to the queue. An earlier implementation voted position by position (each vowel slot and each disputed consonant separately) and produced blends no coastal speaker would recognise (\emph{muur} for ``sea'' from \emph{meri}/\emph{mor}/\emph{meer}); whole-stem voting keeps every Hanse word a word that actually exists somewhere on the shore.
+
+\subsection{Rule 2: the Domain Rule}
+Content words with no shared skeleton are assigned to a family by semantic domain, on the historical logic of who has the oldest and richest vocabulary for it (Table~\ref{tab:domains}). Inside the family the fixed sub-ranking decides: Estonian before Finnish gives \emph{räim} ``Baltic herring'' (fi \emph{silakka}), \emph{suvi} ``summer'' (fi \emph{kesä}), \emph{kalju} ``rock'' (fi \emph{kallio}); Polish before Russian gives \emph{duž} ``big'' (ru \emph{большой}), \emph{koh-} ``love'' (ru \emph{любить}).
+
+\begin{table}[t]
+\centering\small
+\caption{Semantic domains and the family that owns them (Rule 2).}
+\label{tab:domains}
+\begin{tabular}{@{}p{4.2cm}l@{}}
+\toprule
+Domain & Family \\
+\midrule
+Sea, fish and sea animals, weather, seasons, landscape, parts of boats & Finnic \\
+Body, kinship, colours, farm, forest & Baltic \\
+Trade, tools, town, law, money, abstract nouns & Germanic \\
+Verbs of action, motion and emotion; adjectives of quality & Slavic \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Rules 3 and 4: Family Vote and Fallback}
+Pronouns, conjunctions, particles, numerals and all inflectional endings are decided by family vote. A family votes only if its members agree (same skeleton, one differing position allowed); otherwise it abstains. Most votes wins; ties go to the queue. \emph{Two}: D-V in Baltic (\emph{divi}), Slavic (\emph{dva}) and Germanic (\emph{två}) $\rightarrow$ \emph{dva}. \emph{Three}: T-R everywhere except Finnic $\rightarrow$ \emph{tri}. If every family abstains, the word is taken from the first language in the current queue that has a form at all, and that language moves to the back: the yes/no particle \emph{li} is Russian's, in Russian's post-verbal position, because Estonian \emph{kas}, Latvian \emph{vai}, Lithuanian \emph{ar} and Polish \emph{czy} agree on nothing.
+
+\subsection{Rule 5: Collision}
+If two concepts produce the same form, the one derived later takes the runner-up from its own vote. \emph{And}: Finnic \emph{ja} and Slavic \emph{i} tie, the queue favours Estonian, but \emph{ja} already means ``I'' (\S\ref{sec:pronouns}), so ``and'' is \emph{i}. Collisions are checked against every form coined so far, including new words derived at translation time, so the lexicon stays injective.
+
+\subsection{Rule 6: Repair}\label{sec:repair}
+Repair runs once all suffixes are attached and touches only clusters created by attaching a suffix; a cluster inside a derived stem (\emph{Baltmeri}, \emph{tursk}) is part of the word. (i) Identical adjacent consonants merge: \emph{lääs-ste} $\rightarrow$ \emph{lääste}. (ii) A cluster of three or more consonants across the boundary takes an epenthetic \emph{i}: before a final single-consonant suffix (\emph{vid-s-t} $\rightarrow$ \emph{vidsit}), otherwise right after the stem (\emph{vid-l-me} $\rightarrow$ \emph{vidilme}, \emph{pospolit-st} $\rightarrow$ \emph{pospolitist}). (iii) A word-final two-consonant cluster is allowed only if its first consonant is a sonorant or \emph{s} (\emph{talv}, \emph{sort}, \emph{bust}); otherwise \emph{i} is inserted (\emph{vid-t} $\rightarrow$ \emph{vidit}, \emph{duž-m} $\rightarrow$ \emph{dužim}); a final \emph{-s} is tolerated (\emph{vids}, \emph{bus}). (iv) Suffixes consisting of a single obstruent carry a supporting \emph{-e} in the tables (inessive \emph{-se}, allative \emph{-le}, infinitive \emph{-te}). \emph{j} is a semivowel and never forms a cluster (\emph{žeglja} ``sailor'', \emph{kalaja} ``fisher'').
+
+\subsection{Worked example: \emph{herring}}
+Table~\ref{tab:herring} traces the full derivation. Nine forms are gathered and normalized; five of them (Latvian, Lithuanian, Polish, Russian, Danish) fall into one skeleton cluster spanning three families, so the Hanse Rule fires. Baltic nominates \emph{silk}, Slavic \emph{sledz}, Germanic \emph{sild}: a three-way tie. The initial queue puts Swedish first, but Swedish \emph{sill} (S-L) is not in the cluster; Latvian is next and is, so the engine's verdict is \emph{silk} and Latvian rotates to the back. The Manual, however, decrees \emph{sild}. This is the pattern behind most of the divergences reported in \S\ref{sec:eval}: the algorithm and the Manual's author agree on \emph{which} words are Hanse words and \emph{who} owns a domain, and disagree on the last step of filling in a shared skeleton.
+
+\begin{table}[t]
+\centering\small
+\caption{Derivation trace for \emph{herring}. Skeleton cluster members are marked $\bullet$.}
+\label{tab:herring}
+\begin{tabular}{@{}llllc@{}}
+\toprule
+Lang. & Source & Stem & Skeleton & \\
+\midrule
+fi & silli & sili & S-L & \\
+et & heeringas & heeringas & H-R-N-K-S & \\
+lv & siļķe & silk & S-L-K & $\bullet$ \\
+lt & silkė & silk & S-L-K & $\bullet$ \\
+pl & śledź & sledz & S-L-T & $\bullet$ \\
+ru & сельдь & seld & S-L-T & $\bullet$ \\
+sv & sill & sil & S-L & \\
+da & sild & sild & S-L-T & $\bullet$ \\
+de & Hering & hering & H-R-N-K & \\
+\midrule
+\multicolumn{5}{@{}p{7.2cm}@{}}{Rule 1: cluster spans Baltic, Slavic, Germanic. Ballots: \emph{silk}, \emph{sledz}, \emph{sild}. Tie $\rightarrow$ queue (sv, \textbf{lv}, lt, et, fi, pl, de, da, ru) $\rightarrow$ Latvian $\rightarrow$ \emph{silk}; Latvian to the back. Manual decree: \emph{sild}.} \\
+\bottomrule
+\end{tabular}
+\end{table}

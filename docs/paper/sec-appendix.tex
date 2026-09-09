@@ -1,0 +1,51 @@
+\appendix
+\section{The recipe card}\label{app:recipe}
+To make any new Baltmeri word:
+\begin{enumerate}\setlength{\itemsep}{1pt}
+\item \textbf{Gather} the nine translations, normalize, strip endings, compute skeletons.
+\item \textbf{Hanse check:} same skeleton in two families? Take it (family vote on the stem; ties by the queue).
+\item \textbf{Content word?} Assign by domain (sea $\rightarrow$ Finnic, body/colour $\rightarrow$ Baltic, trade/abstract $\rightarrow$ Germanic, verbs/quality $\rightarrow$ Slavic); Estonian, Latvian, Polish, Swedish win inside their families.
+\item \textbf{Function word or ending?} Family vote; ties by the Visby Queue; move the winner to the back.
+\item \textbf{Nothing voted?} Fallback to the queue head that has a form.
+\item \textbf{Collision?} The later concept takes its runner-up.
+\item \textbf{Repair} clusters and add supporting \emph{-e}.
+\item \textbf{Inflect:} plural \emph{-i}; cases \emph{-n, -a, -se, -l, -ste, -le}; verbs \emph{-u, -t, -Ø, -me, -te, -Ø}, past \emph{-l-}, future \emph{-s-}; negation \emph{ne}; question \emph{li}.
+\end{enumerate}
+To make a sentence: SVO, adjective before noun, place before time, no articles, no gender, stress the first syllable, and put the sea at the end.
+
+\section{The seed lexicon with source forms}\label{app:lexicon}
+Table~\ref{tab:lexicon} lists every seed entry in the Manual's derivation order with its nine source forms (fi · et · lv · lt · pl · ru · sv · da · de), the rule the engine applied (R1 Hanse, R2 Domain, R3 Vote), the winning family and deciding language, and whether the engine reproduces the Manual's decree (\checkmark) or the Manual decrees a different form ($\dagger$, engine form shown). Numerals six to ten have no manual decree.
+
+\begin{table*}[p]
+\centering\scriptsize
+\caption{The seed lexicon.}
+\label{tab:lexicon}
+\input{tab-lexicon}
+\end{table*}
+
+Derived entries: \emph{dužus} ``size'' (\emph{duž} + \emph{-us}), \emph{kalaja} ``fisher'' and \emph{žeglja} ``sailor'' (\emph{-ja}), \emph{kalaka} ``little fish'' (\emph{-ka}), \emph{solne} ``salty'' (\emph{-ne}); fixed: \emph{Baltmeri}.
+
+\section{The interlingua}\label{app:interlingua}
+The analysis stage of the translator (\S\ref{sec:engine}) returns a sequence of word specifications in Baltmeri order, each of one of the kinds in Table~\ref{tab:interlingua}, together with sentence-level flags \texttt{negated} and \texttt{question}, and a list of \emph{new concepts}: for every lemma outside the lexicon, its part of speech, semantic domain (Table~\ref{tab:domains}) and first dictionary translation in each of the nine languages in native orthography. Lemmas are English identifiers; the engine resolves them against the seed lexicon, the cache of previously coined words, and finally the new-concept list. The specification is deliberately shallow: it names what is to be said and with which grammatical features, and leaves every decision about form to the engine.
+
+\begin{center}\small
+\captionof{table}{Word specifications in the interlingua.}
+\label{tab:interlingua}
+\begin{tabular}{@{}lp{5.3cm}@{}}
+\toprule
+Kind & Features \\
+\midrule
+noun & lemma; number (sg, pl); case (nom, gen, acc, ine, ade, ela, all); optional compound modifier; optional derivation (abstract, agent, diminutive, adjective) \\
+adj & lemma; number; degree (pos, comp, sup) \\
+adv & lemma; whether formed from an adjective (\emph{-t}) \\
+verb & lemma; tense (pres, past, fut); person (1, 2, 3); number; infinitive flag \\
+pron & one of I, you, he, we, you-pl, they; case \\
+num & numeric value (one to ten are words, larger values digits) \\
+word & lemma of a conjunction, particle, quantifier or preposition \\
+name & proper name in Latin script; case; number \\
+punct & a punctuation mark inside the sentence \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+For the sentence ``Grey seals rest on the rocks in summer'' the analysis is: \texttt{noun}(seal, pl, nom, compound grey) · \texttt{verb}(rest, pres, 3, pl) · \texttt{noun}(rock, pl, ade) · \texttt{noun}(summer, sg, ade), with no new concepts, from which the engine renders \emph{Peleekhüljei odpočiv kaljuil suvil}.
